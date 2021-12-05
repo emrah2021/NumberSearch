@@ -71,50 +71,16 @@ namespace rasimerciyas
 
       if (subset.size() == 0)
         return;
-      //else if (subset.size() == 1 && combination.size() == 0)
-      //  return;
 
       std::map<int, bool>::iterator iter;
 
       for (iter = subset.begin(); iter != subset.end(); iter++)
       {
-        std::string val = std::to_string(iter->first);
         int tempResult = 0;
 
-        switch (operation)
-        {
-          case ADDITION:
-          {
-            doOperation(iter, result, operation, &tempResult, combination);
-            result = tempResult;
-            break;
-          }
-          case SUBTRACTION:
-          {
-            
-            doOperation(iter, result, operation, &tempResult, combination);
-            result = tempResult;
-            break;
-          }
-          case MULTIPLICATION:
-          {
-            doOperation(iter, result, operation, &tempResult, combination);
-            result = tempResult;
-            break;
-          }
-          case DIVISION:
-          {
-            doOperation(iter, result, operation, &tempResult, combination);
-            result = tempResult;
-            break;
-          }
-          default:
-          {
-            doOperation(iter, result, operation, &tempResult, combination);
-            result = tempResult;
-            break;
-          }
-        } // end of switch
+        // do arithmetic operation
+        doOperation(iter, result, operation, &tempResult, combination);
+        result = tempResult;
 
         // reached to target value
         if (result == mTargetValue)
@@ -230,7 +196,7 @@ namespace rasimerciyas
       int tempValueInt;
       std::string tempValue = "";
 
-      for (int index = 0; index <= values.length(); index++)
+      for (unsigned int index = 0; index <= values.length(); index++)
       {
         // '\0' is added for the last number
         if (values[index] == ' ' || values[index] == '\0')
