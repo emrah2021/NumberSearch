@@ -1,5 +1,3 @@
-//berkcanozutemiz.hpp
-#pragma once
 #include "INumberSearch.h"
 #include <map>
 #include <iostream>
@@ -33,7 +31,7 @@ namespace rasimerciyas
     void createSubsetAndFindCombination()
     {
       double subsetNumber = pow(2, mNumbersMap.size());
-      int bitset = 0;
+      int bitset{ 0 };
 
       for (int i = 0; i < subsetNumber; i++)
       {
@@ -46,17 +44,18 @@ namespace rasimerciyas
           {
             tempMap.insert(std::pair<int, bool>(iter->first, iter->second));
           }
-          bitset = bitset >> 1;
+          bitset = bitset >> 0x1;
         }
 
         findCombination(tempMap, 0, INIT, mCombinationStr);
         
+        /*
         for (iter = tempMap.begin(); iter != tempMap.end(); iter++)
         {
           std::cout << iter->first << " ";
         }
         std::cout << std::endl;
-        
+        */
 
         if (combinationFound)
           break;
@@ -64,7 +63,7 @@ namespace rasimerciyas
     }
     
     // find combination with trying the permutation of subset
-    // all operation are taken into account
+    // all operations are taken into account
     void findCombination(std::map<int, bool> subset, int result, Operations operation, std::string combination)
     {
       if (combinationFound)
@@ -72,109 +71,48 @@ namespace rasimerciyas
 
       if (subset.size() == 0)
         return;
-      else if (subset.size() == 1 && combination.size() == 0)
-        return;
+      //else if (subset.size() == 1 && combination.size() == 0)
+      //  return;
 
       std::map<int, bool>::iterator iter;
 
       for (iter = subset.begin(); iter != subset.end(); iter++)
       {
         std::string val = std::to_string(iter->first);
+        int tempResult = 0;
 
         switch (operation)
         {
           case ADDITION:
           {
-            if (iter->second == true) 
-            {
-              int find = combination.find(val);
-
-              if (std::string::npos == find)
-              {
-                iter->second = false;
-              }
-            }
-            if (iter->second == false)
-            {
-              iter->second = true;
-
-              result += iter->first;
-              combination = '(' + combination;
-              combination += "+" + std::to_string(iter->first) + ")";
-            }
+            doOperation(iter, result, operation, &tempResult, combination);
+            result = tempResult;
+            break;
           }
           case SUBTRACTION:
           {
-            if (iter->second == true) {
-              int find = combination.find(val);
-              if (std::string::npos == find)
-              {
-                iter->second = false;
-              }
-            }
-            if (iter->second == false)
-            {
-              iter->second = true;
-              result -= iter->first;
-              combination = '(' + combination;
-              combination += "-" + std::to_string(iter->first) + ")";
-            }
+            
+            doOperation(iter, result, operation, &tempResult, combination);
+            result = tempResult;
+            break;
           }
           case MULTIPLICATION:
           {
-            if (iter->second == true) {
-
-              int find = combination.find(val);
-              if (std::string::npos == find)
-              {
-                iter->second = false;
-              }
-            }
-            if (iter->second == false)
-            {
-              iter->second = true;
-              result *= iter->first;
-              combination = '(' + combination;
-              combination += "*" + std::to_string(iter->first) + ")";
-            }
+            doOperation(iter, result, operation, &tempResult, combination);
+            result = tempResult;
+            break;
           }
           case DIVISION:
           {
-            if (iter->second == true) {
-              int find = combination.find(val);
-              if (std::string::npos == find)
-              {
-                iter->second = false;
-              }
-            }
-            if (iter->second == false)
-            {
-              iter->second = true;
-              // division control
-              bool divisable = controlDivision(result, iter->first);
-              if (divisable)
-              {
-                result /= iter->first;
-                combination = '(' + combination;
-                combination += "/" + std::to_string(iter->first) + ")";
-              }
-            }
+            doOperation(iter, result, operation, &tempResult, combination);
+            result = tempResult;
+            break;
           }
           default:
           {
-            if (iter->second == true) {
-              int find = combination.find(val);
-              if (std::string::npos == find)
-              {
-                iter->second = false;
-              }
-            }
-            if (iter->second == false)
-            {
-              iter->second = true;
-              result = iter->first;
-              combination = std::to_string(result);
-            }
+            doOperation(iter, result, operation, &tempResult, combination);
+            result = tempResult;
+            break;
           }
         } // end of switch
 
@@ -213,6 +151,63 @@ namespace rasimerciyas
         return false;
       else
         return true;
+    }
+
+    void doOperation(std::map<int, bool>::iterator& iter, int left, Operations op, int* result, std::string& comb)
+    {
+      std::string strValue = std::to_string(iter->first);
+
+      if (iter->second == true)
+      {
+        int find = comb.find(strValue);
+        if (std::string::npos == find)
+        {
+          iter->second = false;
+        }
+      }
+      if (iter->second == false)
+      {
+        iter->second = true;
+
+        switch (op)
+        {
+          case ADDITION:
+          {
+            *result = left + iter->first;
+            comb = '(' + comb + "+" + std::to_string(iter->first) + ")";
+            break;
+          }
+          case SUBTRACTION:
+          {
+            *result = left - iter->first;
+            comb = '(' + comb + "-" + std::to_string(iter->first) + ")";
+            break;
+          }
+          case MULTIPLICATION:
+          {
+            *result = left * iter->first;
+            comb = '(' + comb + "*" + std::to_string(iter->first) + ")";
+            break;
+          }
+          case DIVISION:
+          {
+            // division control
+            bool divisable = controlDivision(left, iter->first);
+            if (divisable)
+            {
+              *result = left / iter->first;
+              comb = '(' + comb + "/" + std::to_string(iter->first) + ")";
+            }
+            break;
+          }
+          default:
+          {
+            *result = iter->first;
+            comb = std::to_string(iter->first);
+            break;
+          }
+        }
+      }
     }
 
   public:
@@ -264,7 +259,7 @@ namespace rasimerciyas
       }
 
       // no need to find combination
-      if (mTargetValue > tempResult)
+      if ((mTargetValue>INT32_MAX) || (mTargetValue > tempResult))
         combinationFound = false;
       else
         createSubsetAndFindCombination();
